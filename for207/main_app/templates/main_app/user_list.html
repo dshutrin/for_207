@@ -1,0 +1,73 @@
+{% extends "main_app/admin_base.html" %}
+{% load static %}
+
+{% block content %}
+
+	<div class="container">
+
+		<h3 class="mt-5">Выберите стол для детального обзора</h3>
+
+		<div class="row p-3 pt-5">
+			{% for table in tables %}
+			<div class="card col-3 m-2">
+				<div class="card-body">
+					<h5 class="card-title">Стол №{{table.number}}</h5>
+					{% if table.user.name %}
+						<p class="card-text">Сейчас работает: {{table.user.name}} {{table.user.surname}}</p>
+					{% else %}
+						<p class="card-text text-danger fw-bold">Работник не назначен!</p>
+					{% endif %}
+					<div class="text-end">
+						<a href="/adminka/user_list/tables/{{table.id}}" class="btn btn-primary">Управление столом</a>
+					</div>
+				</div>
+			</div>
+			{% endfor %}
+			<div class="card col-3 m-2">
+				<div class="card-body">
+					<h5 class="card-title">Добавить новый стол</h5>
+					<div class="text-end pt-2">
+						<a href="/adminka/user_list/tables/add" class="btn btn-primary">Создать</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<h3 class="mt-5">Выберите работника для детального обзора</h3>
+
+		<div class="row mb-5 p-3 pt-5">
+			{% for worker in workers %}
+			<div class="card col-3 m-2">
+				<div class="card-body">
+					<h5 class="card-title">{{worker.name}} {{worker.surname}}</h5>
+					<p class="card-body m-0 p-0">
+						<div class="row m-0 p-0">
+							<div class="col-5 fs-3 text-success">
+								{{worker.likes}}<i class="bi bi-hand-thumbs-up"></i>
+							</div>
+							<div class="col-2"></div>
+							<div class="col-5 fs-3 text-danger">
+								{{worker.dislikes}}<i class="bi bi-hand-thumbs-down"></i>
+							</div>
+						</div>
+					</p>
+					<div class="text-end">
+						<a href="/adminka/user_list/workers/{{worker.id}}" class="btn btn-primary">Перейти</a>
+					</div>
+				</div>
+			</div>
+			{% endfor %}
+			<div class="card col-3 m-2">
+				<div class="card-body">
+					<h5 class="card-title">Добавить работника</h5>
+					<div class="text-end pt-2">
+						<a href="/adminka/user_list/workers/add" class="btn btn-primary">Добавить</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+{% endblock %}
