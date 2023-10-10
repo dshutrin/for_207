@@ -1,17 +1,39 @@
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, FileResponse, HttpResponse
 from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.models import User
 
 from .models import *
 from .forms import *
 
 import math
+import xlsxwriter
 
 
 # Create your views here.
 def get_main_page(request):
-	return render(request, 'main_app/start.html', {'tables': Table.objects.all()})
+	return render(request, 'main_app/start.html', {'tables': [x for x in Table.objects.all().order_by('number') if x.user]})
+
+
+def get_check_list(request):
+	workbook = xlsxwriter.Workbook('CheckList.xlsx')
+	worksheet = workbook.add_worksheet()
+
+	data = [
+		(f'{u.surname} {u.name}', u.likes, u.dislikes) for u in Worker.objects.all()
+	]
+
+	row = 0
+	for fio, l, d in (data):
+		worksheet.write(row, 0, fio)
+		worksheet.write(row, 1, l)
+		worksheet.write(row, 2, d)
+		row += 1
+	workbook.close()
+
+	with open('CheckList.xlsx', 'rb') as file:
+		response = HttpResponse(file.read(), content_type='application/xlsx')
+		response['Content-Disposition'] = 'attachment; filename="CheckList.xlsx"'
+		return response
 
 
 def get_table_vars(request, number):
@@ -45,7 +67,7 @@ def adminka(request):
 		return -1
 
 	if request.user.is_authenticated:
-		tables = Table.objects.all()
+		tables = Table.objects.all().order_by('number')
 		tables = sorted(tables, key=get_likes, reverse=True)
 		counts = [x.user.likes for x in tables if x.user] + [x.user.dislikes for x in tables if x.user]
 		if counts:
@@ -109,8 +131,6 @@ def set_new_worker(request, table_id, worker_id):
 
 	if worker_id == 0:
 		table[0].clear_user()
-
-		print('set None')
 	else:
 		worker = Worker.objects.filter(id=worker_id)
 

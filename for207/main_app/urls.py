@@ -9,6 +9,7 @@ urlpatterns = [
 
 
 	path('adminka', adminka),
+	path('adminka/get_check_list', get_check_list),
 	path('adminka/user_list', user_list),
 	path('adminka/user_list/tables/<int:table_id>', table_detail),
 	path('adminka/user_list/tables/add', add_table),
